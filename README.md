@@ -4,9 +4,11 @@ Workshop materials for **DISC x Meta** at Arizona State University (Oct 1, 2026)
 "Fake data, real questions" — an interactive night of mock interviews and a
 hand-tracking case study, built around synthetic Reality Labs-style datasets.
 
-- **Slides:** https://docs.google.com/presentation/d/128R66pbk4UGT8BUdtW0fFTGqR_FQrsfbmeBINu3mITs/edit?usp=drivesdk
-  (a frozen PowerPoint copy is included (`DISC-Talk-Fake-Data-Real-Questions.pptx`))
+- **Slides:** frozen PowerPoint copy in this repo, `DISC-Talk-Fake-Data-Real-Questions.pptx`.
+  The live deck is on [Google Slides](https://docs.google.com/presentation/d/128R66pbk4UGT8BUdtW0fFTGqR_FQrsfbmeBINu3mITs/edit?usp=drivesdk)
+  (may require access).
 - **Everything runs in pandas + numpy + matplotlib.** No Spark needed.
+  See [Run it](#run-it) below.
 - **Answer keys** live separately in [solutions/answer-keys.md](solutions/answer-keys.md)
   so you can work each case without spoilers. No peeking until you run the numbers.
 
@@ -20,8 +22,10 @@ The joint/column vocabulary follows the public OpenXR `XR_EXT_hand_tracking`
 extension: 26 joints per hand (wrist, palm, thumb x4, other fingers x5), each
 with pose + radius and per-joint validity flags; `isActive` gates whether the
 hand is tracked at all. Accuracy context comes from published Quest studies
-(Abdlkarim et al.: ~1.1 cm fingertip error, ~9.6 deg joint-angle error,
-~38 ms delay).
+(Abdlkarim et al., *Behavior Research Methods* 2023: ~1.1 cm fingertip error,
+~9.6 deg joint-angle error, ~45 ms delay; the 2022 preprint reported 38 ms).
+Those numbers are fingertip errors from a lab reaching task on Quest 2, not
+MPJPE over 26 joints, so treat them as context, not a like-for-like baseline.
 
 ## The datasets
 
@@ -103,6 +107,19 @@ Starter:
 df = pd.read_csv("release_perf.csv")
 print(df.groupby(["release","device"])["jitter_mm"].mean().round(2))
 ```
+
+## Run it
+
+```
+pip install pandas numpy matplotlib
+python gen_rl_datasets.py        # rewrites the three CSVs next to the script
+python gen_rl_datasets.py out/   # or write them somewhere else
+```
+
+The generator is seeded (`20261001`) and reproduces the committed CSVs
+byte-for-byte (verified with pandas 3.0.2 / numpy 2.4.4). If you change the
+seed or the parameters, the answer keys no longer match; that is a feature if
+you want to build your own variant.
 
 ## Why the chart is yours to draw
 

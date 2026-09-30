@@ -3,14 +3,24 @@
 All data is SYNTHETIC. Shapes mimic hand-tracking telemetry concepts from the
 public OpenXR XR_EXT_hand_tracking extension (26 joints/hand, joint locations
 with pose+radius, per-joint validity flags, isActive) and published Quest
-accuracy figures (~1.1 cm fingertip error, ~38 ms delay, Abdlkarim et al.).
-Nothing here is real Meta data.
+accuracy figures (~1.1 cm fingertip error, ~9.6 deg joint-angle error, ~45 ms
+delay; Abdlkarim et al., Behavior Research Methods 2023). Nothing here is
+real Meta data.
+
+Usage:
+    python gen_rl_datasets.py            # writes CSVs next to this script
+    python gen_rl_datasets.py out_dir/   # writes CSVs to out_dir/
 """
+import os
+import sys
+
 import numpy as np
 import pandas as pd
 
 rng = np.random.default_rng(20261001)
-OUT = "/home/hatch/workspace/your_files/asu-disc-talk/datasets/"
+OUT = sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.abspath(__file__))
+OUT = os.path.join(OUT, "")  # ensure trailing separator
+os.makedirs(OUT, exist_ok=True)
 
 # ---------------------------------------------------------------- 1. A/B holdout
 # HT-v2 hand-tracking model, 1% holdout: control vs treatment.
