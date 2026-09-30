@@ -23,14 +23,15 @@ OUT = os.path.join(OUT, "")  # ensure trailing separator
 os.makedirs(OUT, exist_ok=True)
 
 # ---------------------------------------------------------------- 1. A/B holdout
-# HT-v2 hand-tracking model, 1% holdout: control vs treatment.
+# HT-v2 hand-tracking model, 1% holdout: c (control) vs t (treatment).
+# One row = one user. Short codes keep the CSV under GitHub's 512 KB table-
+# render limit.
 n_arm = 10000
 df = pd.DataFrame({
-    "user_id": [f"u{i:06d}" for i in range(2 * n_arm)],
-    "group": ["control"] * n_arm + ["treatment"] * n_arm,
+    "group": ["c"] * n_arm + ["t"] * n_arm,
 })
-df["device"] = rng.choice(["quest3", "quest3s"], size=len(df), p=[0.6, 0.4])
-is_t = (df["group"] == "treatment").to_numpy()
+df["device"] = rng.choice(["q3", "q3s"], size=len(df), p=[0.6, 0.4])
+is_t = (df["group"] == "t").to_numpy()
 
 df["gesture_attempts"] = rng.poisson(40, len(df)).clip(min=5)
 p_succ = np.where(is_t, 0.812, 0.780)
@@ -54,8 +55,8 @@ print("pinch false-positive rate:\n", fp.round(4))
 print("crash rate:\n", g["crashed"].mean().round(4))
 print("mean session_min:\n", g["session_min"].mean().round(2))
 print("device mix by group:\n", pd.crosstab(df["group"], df["device"], normalize="index").round(3))
-p1, p2 = succ["treatment"], succ["control"]
-n1, n2 = g["gesture_attempts"].sum()["treatment"], g["gesture_attempts"].sum()["control"]
+p1, p2 = succ["t"], succ["c"]
+n1, n2 = g["gesture_attempts"].sum()["t"], g["gesture_attempts"].sum()["c"]
 z = (p1 - p2) / np.sqrt(p1 * (1 - p1) / n1 + p2 * (1 - p2) / n2)
 print(f"z-test on gesture success: z = {z:.1f} (need |z| > 2.58 for 1% significance)")
 

@@ -32,9 +32,10 @@ MPJPE over 26 joints, so treat them as context, not a like-for-like baseline.
 ### 1. `ht_ab_holdout.csv` (20,000 users) — LIVE CASE
 An A/B test of a new hand-tracking model (HT-v2), run on a **1% traffic
 allocation** with 50/50 randomization (10,000 users per arm).
-Columns: user_id, group (control | treatment), device (quest3 | quest3s),
+Columns: group (c = control | t = treatment), device (q3 = Quest 3 | q3s = Quest 3S),
 gesture_attempts, gesture_successes, pinch_attempts, pinch_false_positives,
-session_min, crashed (0/1).
+session_min, crashed (0/1). One row = one user. Short codes keep the file under
+GitHub's 512 KB table-render limit.
 
 **Question:** did HT-v2 actually improve gestures, and is it safe to roll out?
 
@@ -52,8 +53,8 @@ df = pd.read_csv("ht_ab_holdout.csv")
 g = df.groupby("group")
 rate = g["gesture_successes"].sum() / g["gesture_attempts"].sum()
 print(rate.round(4))
-p1, p2 = rate["treatment"], rate["control"]
-n1, n2 = g["gesture_attempts"].sum()["treatment"], g["gesture_attempts"].sum()["control"]
+p1, p2 = rate["t"], rate["c"]
+n1, n2 = g["gesture_attempts"].sum()["t"], g["gesture_attempts"].sum()["c"]
 z = (p1-p2)/np.sqrt(p1*(1-p1)/n1 + p2*(1-p2)/n2)
 print("z =", round(z,1))
 ```
